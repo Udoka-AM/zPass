@@ -1,0 +1,23 @@
+[package]
+name = "zpass-beacon"
+description = "Zcash root beacon for zPass: post group roots in shielded memos and rebuild the log from a public viewing key"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+authors.workspace = true
+
+[[bin]]
+name = "zpass-beacon"
+path = "src/main.rs"
+
+[dependencies]
+anyhow = "1"
+clap = { version = "4.5", features = ["derive", "env"] }
+hex = "0.4"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+thiserror = "2"
+# librustzcash crates (zcash_client_backend, zcash_client_sqlite, zcash_keys, zcash_protocol):
+# pinned in Milestone 1, task 1.2. See docs/VERSIONS.md.

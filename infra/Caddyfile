@@ -1,0 +1,28 @@
+# Replace the hostnames with the real domains (PRD open question Q9).
+# Access logs drop client IPs (docs/02-TRD.md §2.7).
+(no_ip_logs) {
+	log {
+		format filter {
+			fields {
+				request>remote_ip delete
+				request>client_ip delete
+				request>headers>X-Forwarded-For delete
+			}
+		}
+	}
+}
+
+issuer.zpass.example {
+	import no_ip_logs
+	reverse_proxy issuer:8787
+}
+
+verify.zpass.example {
+	import no_ip_logs
+	reverse_proxy verifier:8788
+}
+
+bot.zpass.example {
+	import no_ip_logs
+	reverse_proxy telegram-bot:8789
+}

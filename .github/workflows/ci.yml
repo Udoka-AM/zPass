@@ -1,0 +1,60 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  rust:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@1.89.0
+        with:
+          components: rustfmt, clippy
+      - uses: Swatinem/rust-cache@v2
+      - run: cargo fmt --all --check
+      - run: cargo clippy --workspace --all-targets -- -D warnings
+      - run: cargo test --workspace
+
+  node:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: zpass
+          POSTGRES_PASSWORD: zpass
+          POSTGRES_DB: zpass
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U zpass" --health-interval 5s --health-retries 10
+    env:
+      DATABASE_URL: postgres://zpass:zpass@localhost:5432/zpass
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm lint
+      - run: pnpm typecheck
+      - name: Migrations, grants and seed apply cleanly
+        run: pnpm db:migrate && pnpm db:seed
+      - name: Verifier role cannot read issuer data
+        env:
+          PGPASSWORD: zpass
+        run: |
+          psql -h localhost -U zpass -d zpass -v ON_ERROR_STOP=1 -c "SET ROLE zpass_verifier; SELECT 1 FROM verifier.scopes LIMIT 1;"
+          if psql -h localhost -U zpass -d zpass -c "SET ROLE zpass_verifier; SELECT 1 FROM issuer.members LIMIT 1;" 2>/dev/null; then
+            echo "verifier role can read issuer.members" && exit 1
+          fi
+      - run: pnpm test
+      - run: pnpm build

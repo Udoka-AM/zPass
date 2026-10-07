@@ -1,0 +1,78 @@
+# zPass backend stack. See infra/README.md and docs/02-TRD.md §2.3.
+#
+#   Local dev (DB only):  docker compose -f infra/docker-compose.yml up -d postgres
+#   Node stack:           docker compose -f infra/docker-compose.yml --profile node up -d
+#   Everything:           docker compose -f infra/docker-compose.yml --profile node --profile app up -d
+
+name: zpass
+
+x-node-service: &node-service
+  env_file: ../.env
+  restart: unless-stopped
+  depends_on:
+    postgres: { condition: service_healthy }
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: zpass
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-zpass}
+      POSTGRES_DB: zpass
+    ports: ["127.0.0.1:5432:5432"]
+    volumes: [pgdata:/var/lib/postgresql/data]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U zpass"]
+      interval: 5s
+      retries: 10
+
+  zebra:
+    profiles: ["node"]
+    image: ${ZEBRA_IMAGE:-zfnd/zebra:latest} # pin an NU7-capable tag in task 1.3
+    environment:
+      ZEBRA_NETWORK__NETWORK: ${ZEBRA_NETWORK:-Testnet}
+    volumes: [zebra-cache:/home/zebra/.cache/zebra]
+    restart: unless-stopped
+
+  zaino:
+    profiles: ["node"]
+    image: ${ZAINO_IMAGE:?set ZAINO_IMAGE to a pinned Zaino image (task 1.3)}
+    depends_on: [zebra]
+    expose: ["8137"]
+    restart: unless-stopped
+
+  issuer:
+    <<: *node-service
+    profiles: ["app"]
+    image: ghcr.io/udoka-am/zpass-issuer:${ZPASS_IMAGE_TAG:-latest}
+    build: { context: .., dockerfile: infra/node.Dockerfile, args: { APP: issuer } }
+    environment:
+      ZPASS_ZAINO_URL: http://zaino:8137
+
+  verifier:
+    <<: *node-service
+    profiles: ["app"]
+    image: ghcr.io/udoka-am/zpass-verifier:${ZPASS_IMAGE_TAG:-latest}
+    build: { context: .., dockerfile: infra/node.Dockerfile, args: { APP: verifier } }
+    environment:
+      ZPASS_ZAINO_URL: http://zaino:8137
+
+  telegram-bot:
+    <<: *node-service
+    profiles: ["app"]
+    image: ghcr.io/udoka-am/zpass-bot:${ZPASS_IMAGE_TAG:-latest}
+    build: { context: .., dockerfile: infra/node.Dockerfile, args: { APP: telegram-bot } }
+    environment:
+      VERIFIER_URL: http://verifier:8788
+
+  caddy:
+    profiles: ["app"]
+    image: caddy:2-alpine
+    volumes: ["./Caddyfile:/etc/caddy/Caddyfile:ro", "caddy-data:/data"]
+    ports: ["80:80", "443:443"]
+    restart: unless-stopped
+
+volumes:
+  pgdata:
+  zebra-cache:
+  caddy-data:

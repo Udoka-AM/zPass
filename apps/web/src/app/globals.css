@@ -1,0 +1,93 @@
+@import "tailwindcss";
+
+/* Design tokens: docs/04-UI-UX-BRIEF.md §4.3. Light is the default theme. */
+:root {
+  --bg: #f7f6f2;
+  --surface: #ffffff;
+  --surface-2: #efede7;
+  --border: #e2dfd7;
+  --text: #17161c;
+  --text-muted: #5e5c66;
+  --primary: #4b3fe0;
+  --primary-ink: #ffffff;
+  --accent: #c98f06;
+  --success: #1f8a5b;
+  --warning: #a86f00;
+  --danger: #c62f35;
+  --info: #2369b3;
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0e0e12;
+    --surface: #17171d;
+    --surface-2: #202028;
+    --border: #2b2b35;
+    --text: #edebf2;
+    --text-muted: #a09eab;
+    --primary: #8b80ff;
+    --primary-ink: #0e0e12;
+    --accent: #f4b728;
+    --success: #3fb37f;
+    --warning: #e5a50a;
+    --danger: #e5484d;
+    --info: #3e8ede;
+    color-scheme: dark;
+  }
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-border: var(--border);
+  --color-text: var(--text);
+  --color-muted: var(--text-muted);
+  --color-primary: var(--primary);
+  --color-primary-ink: var(--primary-ink);
+  --color-accent: var(--accent);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-danger: var(--danger);
+  --color-info: var(--info);
+  --font-display: var(--font-space-grotesk);
+  --font-sans: var(--font-inter);
+  --font-mono: var(--font-jetbrains-mono);
+  --radius-chip: 8px;
+  --radius-control: 12px;
+  --radius-card: 16px;
+  --radius-sheet: 24px;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-inter), system-ui, sans-serif;
+}
+
+h1,
+h2 {
+  font-family: var(--font-space-grotesk), system-ui, sans-serif;
+}
+
+:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.num {
+  font-family: var(--font-jetbrains-mono), ui-monospace, monospace;
+  font-variant-numeric: tabular-nums;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    /* biome-ignore lint/complexity/noImportantStyles: reduced-motion must override component styles */
+    animation-duration: 0.01ms !important;
+    /* biome-ignore lint/complexity/noImportantStyles: reduced-motion must override component styles */
+    transition-duration: 0.01ms !important;
+  }
+}

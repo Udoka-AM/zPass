@@ -1,0 +1,27 @@
+{
+  "name": "@zpass/verifier",
+  "version": "0.0.1",
+  "private": true,
+  "description": "zPass verifier: proof verification, nullifiers, polls and Sign in with zPass",
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "start": "tsx src/index.ts",
+    "build": "tsc --noEmit",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run --passWithNoTests"
+  },
+  "dependencies": {
+    "@hono/node-server": "^2.1.3",
+    "@zpass/db": "workspace:*",
+    "@zpass/verify": "workspace:*",
+    "hono": "^4.13.13",
+    "pino": "^10.4.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22",
+    "tsx": "^4.23.15",
+    "typescript": "~5.9.3",
+    "vitest": "^5.0.3"
+  }
+}
