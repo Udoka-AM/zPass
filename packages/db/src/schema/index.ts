@@ -1,4 +1,3 @@
-export * as issuerSchema from "./issuer";
+// Flat re-exports only: Drizzle iterates every export as a table or relation.
 export * from "./issuer";
-export * as verifierSchema from "./verifier";
 export * from "./verifier";
