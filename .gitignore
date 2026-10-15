@@ -31,3 +31,7 @@ data/
 !.vscode/extensions.json
 *.log
 coverage/
+
+# Semaphore proving artefacts: fetched and checksum-verified by scripts/fetch-artifacts.mjs
+apps/web/public/artifacts/*
+!apps/web/public/artifacts/.gitkeep

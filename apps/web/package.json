@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "typecheck": "tsc --noEmit",
-    "test": "echo \"no web tests yet\""
+    "test": "echo \"no web tests yet\"",
+    "prebuild": "node ../../scripts/fetch-artifacts.mjs"
   },
   "dependencies": {
     "@zpass/sdk": "workspace:*",
