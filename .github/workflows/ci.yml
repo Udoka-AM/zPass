@@ -44,6 +44,8 @@ jobs:
           node-version-file: .nvmrc
           cache: pnpm
       - run: pnpm install --frozen-lockfile
+      - name: Proving artefacts (self-hosted, checksums pinned)
+        run: node scripts/fetch-artifacts.mjs
       - run: pnpm lint
       - run: pnpm typecheck
       - name: Migrations, grants and seed apply cleanly

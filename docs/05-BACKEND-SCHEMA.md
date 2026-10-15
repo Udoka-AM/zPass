@@ -282,6 +282,7 @@ DB-level: `zpass_verifier` has `SELECT, INSERT` on `nullifiers` and `votes` (no 
 |---|---|
 | `groups.slug` | `^[a-z0-9-]{3,32}$`, unique |
 | Commitment, root, nullifier, scope hash | Integer in `[0, p)` where p is the BN254 scalar field modulus |
+| Scope hash | `keccak256(utf8(scopes.id)) >> 8`, decimal (`@zpass/sdk` `scopeHash`). Semaphore v4 only accepts scope strings up to 31 bytes, so ids are hashed the way Semaphore hashes internally |
 | `members.commitment` | Unique per group. Not 0 |
 | Enrolment | One live member per item. Items must be owned by the challenge's holder at commit time |
 | Challenge code | 8 chars Crockford base32. ≤ 5 attempts. 30 min expiry |
