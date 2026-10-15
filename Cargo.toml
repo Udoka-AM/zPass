@@ -5,7 +5,23 @@ members = ["crates/zpass-beacon"]
 [workspace.package]
 version = "0.0.1"
 edition = "2021"
-rust-version = "1.85"
+rust-version = "1.94"
 license = "MIT OR Apache-2.0"
 repository = "https://github.com/Udoka-AM/zPass"
 authors = ["Udoka-AM"]
+
+[workspace.dependencies]
+# Zcash crates (task 1.2, verified 2026-10-15 in sealForge on a local Ironwood chain;
+# see docs/VERSIONS.md). Pre-releases are pinned exactly: the first with Ironwood (NU6.3).
+zcash_protocol = { version = "=0.11.0-pre.1", features = ["local-consensus"] }
+zcash_client_backend = { version = "=0.25.0-pre.2", features = ["lightwalletd-tonic-transport", "sync", "orchard"] }
+zcash_client_sqlite = { version = "=0.23.0-pre.2", features = ["orchard", "transparent-inputs", "serde"] }
+zcash_keys = { version = "=0.17.0-pre.2", features = ["orchard"] }
+zcash_primitives = "=0.31.0-pre.2"
+zcash_proofs = { version = "=0.31.0-pre.2", features = ["bundled-prover"] }
+zcash_address = "=0.14.0-pre.2"
+zip321 = "=0.10.0-pre.2"
+zip32 = "0.3"
+zcash_note_encryption = "0.5"
+orchard = { version = "0.16", default-features = false, features = ["std", "circuit"] }
+tonic = "0.14"
